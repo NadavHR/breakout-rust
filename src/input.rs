@@ -39,6 +39,9 @@ impl Input<'_> {
 
     fn set_paddle_position(&mut self, new_pos: f32) {
         self.paddle_position = new_pos.max(self.paddle_min_x as f32).min(self.paddle_max_x as f32);
+        if self.paddle_position != new_pos { // if hit the bounds set speed to 0
+            self.paddle_speed = 0.0;
+        }
     }
 
     pub fn handle_input(&mut self, delta_time_sec: f32, mut case_of_quit: impl FnMut()) {
