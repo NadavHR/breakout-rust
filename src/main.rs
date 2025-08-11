@@ -1,9 +1,11 @@
 extern crate sdl2;
 mod visuals;
+mod input;
 use sdl2::{rect::Rect, render::Canvas, video::Window, Sdl, VideoSubsystem};
 use std::{sync::LazyLock};
 use visuals::Display;
 use visuals::Dimensions;
+use input::Input;
 struct Paddle {
     x: f32,
     v: f32
