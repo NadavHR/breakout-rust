@@ -20,10 +20,10 @@ fn main() -> Result<(), String> {
     
     let sdl_context = sdl2::init()?;
     let mut display = Display::new(&sdl_context, SCREEN_DIMENSIONS, PADDLE_DIMENSIONS, BALL_DIMENSIONS, BRICK_DIMENSIONS)?;
-    let mut lost = false;
+    let mut game_over = false;
 
     loop {
-        if lost {
+        if game_over {
             break;
         }
         display.clear();
