@@ -2,11 +2,8 @@
 use std::cmp;
 use sdl2::{rect::Rect, render::Canvas, video::Window, Sdl, VideoSubsystem};
 
-#[derive(Clone, Copy)]
-pub struct Dimensions {
-    pub height: u32,
-    pub width: u32
-}
+use crate::util::Dimensions;
+
 pub struct Display<'a> {
     screen_dimensions: Dimensions,
     paddle_rect: Rect,
@@ -54,6 +51,16 @@ impl Display<'_> {
         self.paddle_rect.set_x(cmp::min(x, self.screen_dimensions.width - self.paddle_rect.width()) as i32);
         self.canvas.set_draw_color(sdl2::pixels::Color::RGBA(255, 255, 255, 0));
         match self.canvas.fill_rect(self.paddle_rect) {
+            Ok(_) => {}
+            Err(err) => {println!("error: {err}")}
+        }
+    }
+
+    pub fn draw_ball(&mut self, pos: (i32, i32)) {
+        self.ball_rect.set_x(pos.0);
+        self.ball_rect.set_y(pos.1);
+        self.canvas.set_draw_color(sdl2::pixels::Color::RGBA(255, 255, 255, 0));
+        match self.canvas.fill_rect(self.ball_rect) {
             Ok(_) => {}
             Err(err) => {println!("error: {err}")}
         }

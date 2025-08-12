@@ -57,11 +57,11 @@ impl Input<'_> {
             .filter_map(Keycode::from_scancode)
             .collect();
         // check right and left movements
-        let right_movement = ((&self.right_move_keys - &keys).len() != self.right_move_keys.len()); // right movement
-        let left_movement = ((&self.left_move_keys - &keys).len() != self.left_move_keys.len());    // left movement
+        let right_movement = (&self.right_move_keys - &keys).len() != self.right_move_keys.len(); // right movement
+        let left_movement = (&self.left_move_keys - &keys).len() != self.left_move_keys.len();    // left movement
 
         // calc delta speed
-        let mut paddle_delta_speed: f32 = 0.0;
+        let paddle_delta_speed: f32;
         if right_movement || left_movement {
             paddle_delta_speed = (right_movement as u32 as f32 - left_movement as u32 as f32) * self.paddle_acceleration * delta_time_sec;
         } else {
@@ -79,5 +79,9 @@ impl Input<'_> {
 
     pub fn get_position(&self) -> u32 {
         return self.paddle_position as u32;
+    }
+
+    pub fn get_paddle_speed(&self) -> f32 {
+        return self.paddle_speed;
     }
 }
