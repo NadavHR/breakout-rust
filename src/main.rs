@@ -68,8 +68,9 @@ fn main() -> Result<(), String> {
             ball.update(delta_time_sec, input.get_position(), input.get_paddle_speed(), &mut end_game);
             display.clear();
             display.draw_paddle(input.get_position());
-            display.draw_ball(ball.get_ball_coords());
+            bricks.calc_ball_collision(ball.get_ball_coords() as (u32, u32));
             bricks.draw_bricks(|pos: (u32, u32), life: u8| display.draw_brick(pos, life));
+            display.draw_ball(ball.get_ball_coords());
             display.show();
             last_time_millis = cur_time_millis;
         }

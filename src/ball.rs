@@ -1,3 +1,4 @@
+
 use derive_more::Constructor;
 use crate::util::Dimensions;
 
@@ -29,7 +30,6 @@ pub struct Ball {
     paddle_dimension: Dimensions,
 
 }
-
 
 // TODO: add ball collision with bricks
 impl Ball {
@@ -71,8 +71,8 @@ impl Ball {
 
     }
 
-    pub fn get_ball_coords(&self) -> (i32, i32) {
-        return ((self.x - (self.ball_dimensions.width as f32 * 0.5)) as i32,
-                (self.y - (self.ball_dimensions.height as f32 * 0.5)) as i32);
+    pub fn get_ball_coords(&self) -> (u32, u32) {
+        return ((self.x - (self.ball_dimensions.width as f32 * 0.5)) as u32,
+                (self.y - (self.ball_dimensions.height as f32 * 0.5)) as u32);
     }
 }
