@@ -22,6 +22,8 @@ const FPS: f32 = 60.0;
 const FRAME_TIME_SEC: f32 = 1.0 / FPS;
 const MILLIS_TO_SEC: f32 = 0.001;
 const BALL_Y_SPEED: f32 = 100.0; 
+const BALL_MAX_SPEED_X: f32 = 0.2 * PADDLE_MAX_SPEED;
+const BALL_X_SPEED_GAIN: f32 = 0.2;
 fn get_time_millis() -> u128 {
     return time::SystemTime::now().duration_since(time::UNIX_EPOCH).unwrap().as_millis();
 }
@@ -35,7 +37,7 @@ fn main() -> Result<(), String> {
                                                         PADDLE_DECELERATION)?;
     let mut ball = Ball::new((SCREEN_DIMENSIONS.width as f32) * 0.5, (SCREEN_DIMENSIONS.height as f32) * 0.5, 
                                 0.0, BALL_Y_SPEED, SCREEN_DIMENSIONS.height, 0, SCREEN_DIMENSIONS.width,
-                                0, BALL_DIMENSIONS, PADDLE_DIMENSIONS);
+                                0, BALL_MAX_SPEED_X, BALL_X_SPEED_GAIN, BALL_DIMENSIONS, PADDLE_DIMENSIONS);
     let mut game_over = false;
     let mut last_time_millis = get_time_millis();
     loop {

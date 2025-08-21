@@ -22,6 +22,9 @@ pub struct Ball {
     x_max: u32,
     x_min: u32,
 
+    x_max_speed: f32,
+    x_speed_gain: f32,
+
     ball_dimensions: Dimensions,
     paddle_dimension: Dimensions,
 
@@ -31,7 +34,7 @@ pub struct Ball {
 // TODO: add ball collision with bricks
 impl Ball {
     fn bounds_collision_x(&mut self) {
-        // yes how this is calculated does mean that if the ball gets too fast it will always remain offscreen but the ball cant get any faster than the player.
+        // yes how this is calculated does mean that if the ball gets too fast it will always remain offscreen but the ball has a max speed.
         if self.x > self.x_max as f32{
             collide!(self.x, self.x_speed, self.x_max as f32);
         } else if self.x < self.x_min as f32{
@@ -43,10 +46,11 @@ impl Ball {
         let paddle_y = (self.y_max - self.paddle_dimension.height) as f32;
         if self.y < self.y_min as f32 {
             collide!(self.y, self.y_speed, self.y_min as f32);
-        } else if self.y > paddle_y{ // either collision with paddle or game over
-            if (paddle_x..(paddle_x + self.paddle_dimension.width)).contains(&(self.x as u32)) { // bounced
-                collide!(self.y, self.y_speed, paddle_y);
-                self.x_speed = (paddle_speed + self.x_speed) * 0.5;
+        } else if self.y > paddle_y { // either collision with paddle or game over
+            if (paddle_x..(paddle_x + self.paddle_dimension.width)).contains(&(self.x as u32)) && self.y_speed > 0.0 { // bounced
+                // collide!(self.y, self.y_speed, paddle_y);
+                self.y_speed *= -1.0;
+                self.x_speed = (paddle_speed + (self.x_speed * self.x_speed_gain)).clamp(-self.x_max_speed, self.x_max_speed);
             } else if self.y > self.y_max as f32 { // game over 
                 end_game();
             } 
