@@ -9,6 +9,7 @@ pub struct Display<'a> {
     paddle_rect: Rect,
     ball_rect: Rect,
     brick_rect: Rect,
+    brick_max_life: u8,
     sdl_context: &'a Sdl,
     video_subsystem: VideoSubsystem,
     canvas: Canvas<Window>
@@ -20,6 +21,7 @@ impl Display<'_> {
                     paddle_dimensions: Dimensions, 
                     ball_dimensions: Dimensions,
                     brick_dimensions: Dimensions,
+                    brick_max_life: u8,
                 ) -> Result<Display<'a>, String> {
         let video_subsystem = sdl_context.video()?;
         let window = video_subsystem
@@ -38,7 +40,7 @@ impl Display<'_> {
             screen_dimensions, 
             paddle_rect: Rect::new(0, (screen_dimensions.height - paddle_dimensions.height) as i32, paddle_dimensions.width, paddle_dimensions.height),
             brick_rect: Rect::new(0, 0, brick_dimensions.width, brick_dimensions.height), 
-            ball_rect: Rect::new(0, 0, ball_dimensions.width, ball_dimensions.height), sdl_context, video_subsystem, canvas
+            ball_rect: Rect::new(0, 0, ball_dimensions.width, ball_dimensions.height), sdl_context, video_subsystem, canvas, brick_max_life
         })
     }
 
@@ -63,6 +65,17 @@ impl Display<'_> {
         match self.canvas.fill_rect(self.ball_rect) {
             Ok(_) => {}
             Err(err) => {println!("error: {err}")}
+        }
+    }
+
+    pub fn draw_brick(&mut self, pos: (u32, u32), life: u8) {
+        self.brick_rect.set_x(pos.0 as i32);
+        self.brick_rect.set_y(pos.1 as i32);
+        let brightness = ((life as f32 / self.brick_max_life as f32) * 255.0) as u8;
+        self.canvas.set_draw_color(sdl2::pixels::Color::RGBA(brightness, brightness, brightness, 0));
+        match self.canvas.fill_rect(self.brick_rect) {
+            Ok(_) => {}
+            Err(err) => {print!("error: {err}")}
         }
     }
 
