@@ -71,10 +71,15 @@ fn main() -> Result<(), String> {
             ball.apply_collision(bricks.calc_ball_collision(delta_time_sec,ball.get_ball_coords(), ball.get_ball_speed()));
             bricks.draw_bricks(|pos: (u32, u32), life: u8| display.draw_brick(pos, life));
             display.draw_ball(ball.get_ball_coords());
+            display.set_score(bricks.score).unwrap();
             display.show();
             last_time_millis = cur_time_millis;
+            if bricks.score == BRICKS_GAMEPLAY_DIMENSIONS.area() as u32 * BRICK_LIFE as u32 {
+                game_over = true;
+                println!("You Won!");
+            }
         }
-
     }
+    println!("SCORE: {}", bricks.score);
     return Ok(());
 }

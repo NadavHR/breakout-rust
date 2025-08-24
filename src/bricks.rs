@@ -8,7 +8,8 @@ pub struct Bricks {
     brick_dimensions: Dimensions,
     gameplay_to_disp: (f32, f32),
     brick_initial_life: u8,
-    buffer: Box<[u8]>
+    buffer: Box<[u8]>,
+    pub score: u32
 }
 
 impl Bricks {
@@ -18,7 +19,7 @@ impl Bricks {
             (display_dimensions.width ) as f32 / gameplay_dimensions.width as f32,
             (display_dimensions.height) as f32 / gameplay_dimensions.height as f32
         ); 
-        return Bricks { display_dimensions, gameplay_dimensions, brick_initial_life, buffer, gameplay_to_disp, brick_dimensions }
+        return Bricks { display_dimensions, gameplay_dimensions, brick_initial_life, buffer, gameplay_to_disp, brick_dimensions, score: 0 }
     }
 
     fn buffer_index(&self, x: u32, y: u32) -> usize {
@@ -48,6 +49,7 @@ impl Bricks {
             return (0.0, 0.0);
         }
         self.buffer[ball_buffer_index] -= 1; // decrease life of collided brick
+        self.score += 1; // increase score by 1
 
         let ball_last_pos = (ball_pos.0 as f32 - (ball_speed.0 * delta_time_sec), ball_pos.1 as f32 - (ball_speed.1 * delta_time_sec));
 
@@ -68,6 +70,7 @@ impl Bricks {
             return ((delta_time_sec - t_x_collision) * ball_speed.0, 0.0);
         }  
         self.buffer[ball_buffer_index] += 1; // if the ball was just in the space between bricks, dont decrease bricks life
+        self.score -= 1; // if the ball didnt really collide dont increase score
         return (0.0, 0.0); // there still is the possibility the ball is in a dead space between the bricks 
         
     }
