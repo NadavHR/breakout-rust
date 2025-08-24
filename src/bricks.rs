@@ -41,18 +41,34 @@ impl Bricks {
         }
     }
 
-    pub fn calc_ball_collision(&mut self, ball_pos: (u32, u32)) -> (u32, u32) {
+    pub fn calc_ball_collision(&mut self, delta_time_sec: f32, ball_pos: (u32, u32), ball_speed: (f32, f32)) -> (f32, f32) {
         let ball_gameplay_pos = self.display_to_gameplay(ball_pos);
         let ball_buffer_index = self.buffer_index(ball_gameplay_pos.0, ball_gameplay_pos.1);
-        if ball_buffer_index >= self.gameplay_dimensions.area() {  // if not colliding with anything
-            return (0, 0);
+        if ball_buffer_index >= self.gameplay_dimensions.area() || self.buffer[ball_buffer_index] == 0 {  // if not colliding with anything or colliding with already destroyed brick
+            return (0.0, 0.0);
         }
-        if self.buffer[ball_buffer_index] == 0 {  // if colliding with already destroyed brick
-            return (0, 0);
+        self.buffer[ball_buffer_index] -= 1; // decrease life of collided brick
+
+        let ball_last_pos = (ball_pos.0 as f32 - (ball_speed.0 * delta_time_sec), ball_pos.1 as f32 - (ball_speed.1 * delta_time_sec));
+
+        let brick_base = self.gameplay_to_display(ball_gameplay_pos);
+        // here we calculate whether the collision was on the x or y axis by checking if it intersected with the x or y of the brick
+        let t_y_collision = ((brick_base.1 +
+            (if ball_speed.1 < 0.0 {self.brick_dimensions.height} else {0})
+            ) as f32 - ball_last_pos.1) / ball_speed.1;
+        if 0.0 <= t_y_collision && t_y_collision <= delta_time_sec { 
+            return (0.0, (delta_time_sec - t_y_collision) * ball_speed.1);
         }
 
-        self.buffer[ball_buffer_index] -= 1; // decrease life of collided brick
-        return (0, 0);
+        let t_x_collision = ((brick_base.0 +
+            (if ball_speed.0 < 0.0 {self.brick_dimensions.width} else {0})
+            ) as f32 - ball_last_pos.0) / ball_speed.0;
+
+        if 0.0 <= t_x_collision && t_x_collision <= delta_time_sec {
+            return ((delta_time_sec - t_x_collision) * ball_speed.0, 0.0);
+        }  
+        self.buffer[ball_buffer_index] += 1; // if the ball was just in the space between bricks, dont decrease bricks life
+        return (0.0, 0.0); // there still is the possibility the ball is in a dead space between the bricks 
         
     }
 }

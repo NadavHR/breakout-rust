@@ -75,4 +75,19 @@ impl Ball {
         return ((self.x - (self.ball_dimensions.width as f32 * 0.5)) as u32,
                 (self.y - (self.ball_dimensions.height as f32 * 0.5)) as u32);
     }
+
+    pub fn get_ball_speed(&self) -> (f32, f32) {
+        return (self.x_speed, self.y_speed);
+    }
+
+    pub fn apply_collision(&mut self, body_penetration: (f32, f32)) {
+        if body_penetration.0 != 0.0 {
+            self.x_speed *= -1.0;
+            self.x -= body_penetration.0 * 2.0;
+        }
+        if body_penetration.1 != 0.0 {
+            self.y_speed *= -1.0;
+            self.y -= body_penetration.1 * 2.0;
+        }
+    }
 }
