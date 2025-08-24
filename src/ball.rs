@@ -50,7 +50,7 @@ impl Ball {
             if (paddle_x..(paddle_x + self.paddle_dimension.width)).contains(&(self.x as u32)) && self.y_speed > 0.0 { // bounced
                 // collide!(self.y, self.y_speed, paddle_y);
                 self.y_speed *= -1.0;
-                self.x_speed = (paddle_speed + (self.x_speed * self.x_speed_gain)).clamp(-self.x_max_speed, self.x_max_speed);
+                self.x_speed = (self.x_speed + (paddle_speed * self.x_speed_gain)).clamp(-self.x_max_speed, self.x_max_speed);
             } else if self.y > self.y_max as f32 { // game over 
                 end_game();
             } 

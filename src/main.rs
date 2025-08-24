@@ -34,7 +34,7 @@ const FRAME_TIME_SEC: f32 = 1.0 / FPS;
 const MILLIS_TO_SEC: f32 = 0.001;
 const BALL_Y_SPEED: f32 = 100.0; 
 const BALL_MAX_SPEED_X: f32 = 0.2 * PADDLE_MAX_SPEED;
-const BALL_X_SPEED_GAIN: f32 = 0.2;
+const BALL_X_SPEED_GAIN: f32 = 0.5;
 const BRICK_LIFE: u8 = 3;
 
 fn get_time_millis() -> u128 {
