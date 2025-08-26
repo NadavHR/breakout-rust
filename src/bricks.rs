@@ -1,4 +1,7 @@
-use crate::util::Dimensions;
+use std::cmp::{max, min};
+
+use crate::{clamp, util::Dimensions};
+
 
 
 
@@ -42,35 +45,56 @@ impl Bricks {
         }
     }
 
-    pub fn calc_ball_collision(&mut self, delta_time_sec: f32, ball_pos: (u32, u32), ball_speed: (f32, f32)) -> (f32, f32) {
-        let ball_gameplay_pos = self.display_to_gameplay(ball_pos);
-        let ball_buffer_index = self.buffer_index(ball_gameplay_pos.0, ball_gameplay_pos.1);
-        if ball_buffer_index >= self.gameplay_dimensions.area() || self.buffer[ball_buffer_index] == 0 {  // if not colliding with anything or colliding with already destroyed brick
-            return (0.0, 0.0);
+    fn calc_collision_against_brick(&mut self, delta_time_sec: f32, calculated_ball_last_pos: (f32, f32), ball_speed: (f32, f32), brick_gameplay_pos: (u32, u32)) ->  Option<(f32, f32)> {
+        let brick_base = self.gameplay_to_display(brick_gameplay_pos);
+        let buffer_index = self.buffer_index(brick_gameplay_pos.0, brick_gameplay_pos.1);
+        if self.buffer[buffer_index] == 0 { // if colliding with already destroyed brick 
+            return None;
         }
-        self.buffer[ball_buffer_index] -= 1; // decrease life of collided brick
-        self.score += 1; // increase score by 1
-
-        let ball_last_pos = (ball_pos.0 as f32 - (ball_speed.0 * delta_time_sec), ball_pos.1 as f32 - (ball_speed.1 * delta_time_sec));
-
-        let brick_base = self.gameplay_to_display(ball_gameplay_pos);
+        // start by assuming successful collision and fix later if wrong
+        self.buffer[buffer_index] -= 1;
+        self.score += 1; 
         // here we calculate whether the collision was on the x or y axis by checking if it intersected with the x or y of the brick
         let t_y_collision = ((brick_base.1 +
             (if ball_speed.1 < 0.0 {self.brick_dimensions.height} else {0})
-            ) as f32 - ball_last_pos.1) / ball_speed.1;
+            ) as f32 - calculated_ball_last_pos.1) / ball_speed.1;
         if 0.0 <= t_y_collision && t_y_collision <= delta_time_sec { 
-            return (0.0, (delta_time_sec - t_y_collision) * ball_speed.1);
+            return Some((0.0, (delta_time_sec - t_y_collision) * ball_speed.1));
         }
 
         let t_x_collision = ((brick_base.0 +
             (if ball_speed.0 < 0.0 {self.brick_dimensions.width} else {0})
-            ) as f32 - ball_last_pos.0) / ball_speed.0;
+            ) as f32 - calculated_ball_last_pos.0) / ball_speed.0;
 
         if 0.0 <= t_x_collision && t_x_collision <= delta_time_sec {
-            return ((delta_time_sec - t_x_collision) * ball_speed.0, 0.0);
+            return Some(((delta_time_sec - t_x_collision) * ball_speed.0, 0.0));
         }  
-        self.buffer[ball_buffer_index] += 1; // if the ball was just in the space between bricks, dont decrease bricks life
+        // fix if collision unsuccessful
+        self.buffer[buffer_index] += 1; // if the ball was just in the space between bricks, dont decrease bricks life
         self.score -= 1; // if the ball didnt really collide dont increase score
+        return None;
+    }
+
+    pub fn calc_ball_collision(&mut self, delta_time_sec: f32, ball_pos: (u32, u32), ball_last_pos: (u32, u32), ball_speed: (f32, f32)) -> (f32, f32) {
+        let ball_gameplay_pos = self.display_to_gameplay(ball_pos);
+        let ball_last_gameplay_pos = (clamp!(self.display_to_gameplay(ball_last_pos).0, (0, self.gameplay_dimensions.width-1)),
+                                                clamp!(self.display_to_gameplay(ball_last_pos).1, (0, self.gameplay_dimensions.height-1)));
+
+        let ball_buffer_index = self.buffer_index(ball_gameplay_pos.0, ball_gameplay_pos.1);
+        if ball_buffer_index >= self.gameplay_dimensions.area() {  // if not colliding with anything 
+            return (0.0, 0.0);
+        }
+        let calculated_ball_last_pos = (ball_pos.0 as f32 - (ball_speed.0 * delta_time_sec), ball_pos.1 as f32 - (ball_speed.1 * delta_time_sec));
+
+        // check collisions against every brick the ball could have touched on the way 
+        for i in min(ball_gameplay_pos.0, ball_last_gameplay_pos.0)..=max(ball_gameplay_pos.0, ball_last_gameplay_pos.0) {
+            for j in min(ball_gameplay_pos.1, ball_last_gameplay_pos.1)..=max(ball_gameplay_pos.1, ball_last_gameplay_pos.1) {
+                if let Some(penetration) = self.calc_collision_against_brick(delta_time_sec, calculated_ball_last_pos, ball_speed, (i, j)) {
+                    return penetration;
+                }
+            }
+        }
+        
         return (0.0, 0.0); // there still is the possibility the ball is in a dead space between the bricks 
         
     }

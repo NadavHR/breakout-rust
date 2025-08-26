@@ -1,5 +1,3 @@
-
-use derive_more::Constructor;
 use crate::util::Dimensions;
 
 macro_rules! collide {
@@ -9,10 +7,12 @@ macro_rules! collide {
     };
 }
 
-#[derive(Constructor)]
+
 pub struct Ball {
     x: f32,
     y: f32,
+
+    last_pos: (f32, f32),
     
     x_speed: f32,
     y_speed: f32,
@@ -33,6 +33,13 @@ pub struct Ball {
 
 // TODO: add ball collision with bricks
 impl Ball {
+
+    pub fn new(x: f32, y: f32, x_speed: f32, y_speed: f32, y_max: u32, y_min: u32, x_max: u32, x_min: u32,
+            x_max_speed: f32, x_speed_gain: f32, ball_dimensions: Dimensions, paddle_dimension: Dimensions) -> Ball {
+        return Ball { x, y, x_speed, y_speed, y_max, y_min, x_max, x_min, x_max_speed, x_speed_gain,
+                      ball_dimensions, paddle_dimension, last_pos: (x, y) }
+    }
+
     fn bounds_collision_x(&mut self) {
         // yes how this is calculated does mean that if the ball gets too fast it will always remain offscreen but the ball has a max speed.
         if self.x > self.x_max as f32{
@@ -59,6 +66,7 @@ impl Ball {
 
 
     pub fn update(&mut self, delta_time: f32, paddle_x: u32, paddle_speed: f32, end_game: impl FnMut()) {
+        self.last_pos = (self.x, self.y);
         
         self.x += self.x_speed * delta_time;
         self.y += self.y_speed * delta_time;
@@ -74,6 +82,11 @@ impl Ball {
     pub fn get_ball_coords(&self) -> (u32, u32) {
         return ((self.x - (self.ball_dimensions.width as f32 * 0.5)) as u32,
                 (self.y - (self.ball_dimensions.height as f32 * 0.5)) as u32);
+    }
+
+    pub fn get_last_ball_pos(&self) -> (u32, u32) {
+        return ((self.last_pos.0 - (self.ball_dimensions.width as f32 * 0.5)) as u32,
+                (self.last_pos.1 - (self.ball_dimensions.height as f32 * 0.5)) as u32);
     }
 
     pub fn get_ball_speed(&self) -> (f32, f32) {

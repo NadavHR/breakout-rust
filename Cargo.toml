@@ -5,4 +5,4 @@ edition = "2024"
 
 [dependencies]
 sdl2 = "0.38"
-derive_more = {version = "2.0.1", features = ["full"]}
+# derive_more = {version = "2.0.1", features = ["full"]}

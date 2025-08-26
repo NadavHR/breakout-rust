@@ -25,7 +25,7 @@ impl Display<'_> {
                 ) -> Result<Display<'a>, String> {
         let video_subsystem = sdl_context.video()?;
         let window = video_subsystem
-            .window("PONG - SCORE: 0", screen_dimensions.width, screen_dimensions.height)
+            .window("BREAKOUT - SCORE: 0", screen_dimensions.width, screen_dimensions.height)
             .position_centered()
             .build()
             .map_err(|e| e.to_string())?;
@@ -83,7 +83,7 @@ impl Display<'_> {
     }
 
     pub fn set_score(&mut self, score: u32) -> Result<(), NulError> {
-        return self.canvas.window_mut().set_title(format!("PONG - SCORE: {}", score).as_str());
+        return self.canvas.window_mut().set_title(format!("BREAKOUT - SCORE: {}", score).as_str());
     }
 }
 
