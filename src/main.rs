@@ -51,7 +51,7 @@ fn main() -> Result<(), String> {
                                                         PADDLE_DECELERATION)?;
     let mut ball = Ball::new((SCREEN_DIMENSIONS.width as f32) * 0.5, (SCREEN_DIMENSIONS.height - PADDLE_DIMENSIONS.height)as f32, 
                                 0.0, -BALL_Y_SPEED, SCREEN_DIMENSIONS.height, 0, SCREEN_DIMENSIONS.width,
-                                0, BALL_MAX_SPEED_X, BALL_X_SPEED_GAIN, BALL_DIMENSIONS, PADDLE_DIMENSIONS);
+                                0, BALL_MAX_SPEED_X, BALL_X_SPEED_GAIN, PADDLE_DIMENSIONS);
     let mut bricks = Bricks::new(BRICKS_DISPLAY_DIMENSIONS, BRICKS_GAMEPLAY_DIMENSIONS, BRICK_LIFE, BRICK_DIMENSIONS);
     let mut game_over = false;
     let mut last_time_millis = get_time_millis();

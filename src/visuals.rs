@@ -58,8 +58,8 @@ impl Display<'_> {
     }
 
     pub fn draw_ball(&mut self, pos: (u32, u32)) {
-        self.ball_rect.set_x(pos.0 as i32);
-        self.ball_rect.set_y(pos.1 as i32);
+        self.ball_rect.set_x(pos.0 as i32 - (self.ball_rect.width() as i32 / 2));
+        self.ball_rect.set_y(pos.1 as i32 - (self.ball_rect.height() as i32 / 2));
         self.canvas.set_draw_color(sdl2::pixels::Color::RGBA(255, 255, 255, 0));
         match self.canvas.fill_rect(self.ball_rect) {
             Ok(_) => {}
